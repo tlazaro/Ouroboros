@@ -19,7 +19,7 @@ abstract class UpdateFunc[T](private[this] val lapse0 : Long @@ Milliseconds) ex
   
 class CountFunc(private[this] val lapse0 : Long @@ Milliseconds,
                 val max: Int) extends UpdateFunc[Int](lapse0) {
-  def apply(): Int = ((max * loop.fraction) - 1).toInt
+  def apply(): Int = math.max(((max * loop.fraction) - 1).toInt, 0)
 }
 
 object Shot {

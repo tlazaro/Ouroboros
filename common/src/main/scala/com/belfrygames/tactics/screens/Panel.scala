@@ -18,7 +18,7 @@ class Panel(val cWidth: Int, val cHeight: Int, val sideSize: Int, private[this] 
   val left = new TextureRegion(textureRegion, 0, cHeight, cWidth, sideSize)
   val right = new TextureRegion(textureRegion, cWidth + sideSize, cHeight, cWidth, sideSize)
   
-  val center = new TextureRegion(textureRegion, cWidth, cHeight, sideSize, sideSize)
+  val middle = new TextureRegion(textureRegion, cWidth, cHeight, sideSize, sideSize)
   
   var _width = 0f
   override def width = _width
@@ -31,7 +31,7 @@ class Panel(val cWidth: Int, val cHeight: Int, val sideSize: Int, private[this] 
   override def draw(spriteBatch : SpriteBatch) {
     if (textureRegion != null) {
       // Draw center
-      spriteBatch.draw(center, x + xOffset + cWidth, y + yOffset + cHeight, width - cWidth * 2, height - cHeight * 2)
+      spriteBatch.draw(middle, x + xOffset + cWidth, y + yOffset + cHeight, width - cWidth * 2, height - cHeight * 2)
       
       // Draw corners
       spriteBatch.draw(topleft, x + xOffset, y + yOffset + height - cWidth, cWidth, cHeight)
