@@ -13,6 +13,7 @@ object Art {
   lazy val right = load("res/right.png")
   lazy val walkRight = split("res/walkRight.png", 64, 138, 1, 1, false, false)
   lazy val walkLeft = split("res/walkLeft.png", 68, 146, 1, 1, false, false)
+  lazy val cursor = load("res/cursor.png")
   
   def load () {
     font; menu; menuCursor; left; right; walkRight; walkLeft

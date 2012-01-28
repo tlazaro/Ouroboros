@@ -1,5 +1,6 @@
 package com.belfrygames.input
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 
 object InputManager extends InputProcessor {
@@ -8,6 +9,9 @@ object InputManager extends InputProcessor {
   
   private val keyActions = new Array[GameAction](NUM_KEY_CODES)
   private val mouseActions = new Array[GameAction](NUM_MOUSE_CODES)
+  
+  var x : Int = 0
+  var y : Int = 0
   
   /**
    * Maps a GameAction to a specific key. The key codes are defined in
@@ -131,6 +135,11 @@ object InputManager extends InputProcessor {
   override def touchDragged (x: Int, y: Int, pointer: Int): Boolean = {
     touchMoved(x, y)
   }
-  override def touchMoved (x: Int, y: Int): Boolean = false
+  override def touchMoved (x: Int, y: Int): Boolean = {
+    this.x = x
+    this.y = Gdx.graphics.getHeight - y
+    true
+  }
+  
   override def scrolled (amount: Int): Boolean = false
 }

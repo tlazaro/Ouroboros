@@ -35,7 +35,7 @@ class Level (private[this] val file0: FileHandle, val camera : OrthographicCamer
     map.layers.removeAll(markers)
     
     val collisionLayer = map.layers.filter(_.name == Level.COLLISION)
-    map.layers.removeAll(collisionLayer)
+//    map.layers.removeAll(collisionLayer)
     
     for (tileSet <- map.tileSets.toList) {
       val gid = tileSet.firstgid

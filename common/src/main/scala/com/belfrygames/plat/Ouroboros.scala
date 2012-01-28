@@ -2,9 +2,14 @@ package com.belfrygames.plat
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector2
 import com.belfrygames.core.Screen
 import com.belfrygames.input.InputManager
 import com.belfrygames.plat.player.Boro
+import com.belfrygames.plat.player.Particle
+import com.belfrygames.plat.player.Shot
+import com.belfrygames.plat.player.Sprite
+import com.belfrygames.plat.player.Updateable
 import com.belfrygames.tactics.InputMappings
 import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
@@ -14,6 +19,16 @@ class Ouroboros extends Screen {
   lazy val level = new Level(mapFile, cam)
   
   lazy val boro = new Boro(level)
+  
+  lazy val cursor = new Sprite with Particle with Updateable {
+    textureRegion = Art.cursor
+    
+    override def update(elapsed : Long @@ Milliseconds) {
+      x = InputManager.x + cam.position.x - Gdx.graphics.getWidth / 2 - width / 2
+      y = InputManager.y + cam.position.y - Gdx.graphics.getHeight / 2 - height / 2
+    }
+  }
+    
   override def create() {
     super.create()
     
@@ -22,6 +37,21 @@ class Ouroboros extends Screen {
     import InputMappings._
     
     // Global mappings
+    shot.appendAction(() => {
+        println("FIRE!")
+        val ball = new Shot(level)
+        ball.x = boro.x
+        ball.y = boro.y
+      
+        val dir = new Vector2(cursor.x - ball.x, cursor.y - ball.y)
+        val speed = dir.nor.mul(Shot.SPEED)
+        ball.xSpeed = speed.x
+        ball.ySpeed = speed.y
+        
+        addUpdateable(ball)
+        regularCam.addDrawable(ball)
+    })
+    
     exit appendAction Gdx.app.exit
     
     addUpdateable(level)
@@ -37,6 +67,9 @@ class Ouroboros extends Screen {
     
     addUpdateable(boro)
     regularCam.addDrawable(boro)
+    
+    addUpdateable(cursor)
+    regularCam.addDrawable(cursor)
 
     maxCamPosition.set(level.tileMapRenderer.getMapWidthUnits(), level.tileMapRenderer.getMapHeightUnits())
     

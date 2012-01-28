@@ -21,11 +21,25 @@ class CountFunc(private[this] val lapse0 : Long @@ Milliseconds,
                 val max: Int) extends UpdateFunc[Int](lapse0) {
   def apply(): Int = ((max * loop.fraction) - 1).toInt
 }
+
+object Shot {
+  val GRAVITY = -0.005f
+  val SPEED = 2
+}
+ 
+class Shot(val level: Level) extends Sprite with AcceleratedUpdateable {
+  textureRegion = Art.cursor
+  yAccel = Shot.GRAVITY
   
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+  }
+}
+
 object Boro {
   val SPEED = 1.0f 
-  val GRAVITY = -0.025f
-  val JUMP_SPEED = 4f
+  val GRAVITY = -0.015f
+  val JUMP_SPEED = 3f
 }
 
 class Boro(val level: Level) extends Sprite with AcceleratedUpdateable {

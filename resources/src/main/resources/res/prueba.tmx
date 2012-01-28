@@ -16,11 +16,6 @@
    eJzt1cEJACAMBMG0Zv9N+RcJPkTvMQOpYOFSBQBAkrEcf+mRY22hB5DCNuXY/Qpd/uhaaAK80m3P6UbZrXv0yKJHFj2yTIUZGKI=
   </data>
  </layer>
- <layer name="mid" width="100" height="20">
-  <data encoding="base64" compression="zlib">
-   eJzt1cEJACAMBMG0Zv9N+RcJPkTvMQOpYOFSBQBAkrEcf+mRY22hB5DCNuXY/Qpd/uhaaAK80m3P6UbZrXv0yKJHFj2yTIUZGKI=
-  </data>
- </layer>
  <layer name="markers" width="100" height="20" visible="0">
   <data encoding="base64" compression="zlib">
    eJztzgENAAAIA6Dbv7QxPh0kIAEAAAAAAADgk2kHjlogeAAC
