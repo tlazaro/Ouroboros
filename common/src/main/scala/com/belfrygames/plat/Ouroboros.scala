@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import com.belfrygames.core.Screen
 import com.belfrygames.input.InputManager
 import com.belfrygames.plat.player.Boro
+import com.belfrygames.plat.player.CloneShot
 import com.belfrygames.plat.player.Particle
 import com.belfrygames.plat.player.Shot
 import com.belfrygames.plat.player.Sprite
@@ -18,8 +19,6 @@ class Ouroboros extends Screen {
   lazy val mapFile = Gdx.files.internal("res/prueba.tmx")
   lazy val level = new Level(mapFile, cam)
   
-  lazy val boro = new Boro(level)
-  
   lazy val cursor = new Sprite with Particle with Updateable {
     textureRegion = Art.cursor
     
@@ -28,29 +27,51 @@ class Ouroboros extends Screen {
       y = InputManager.y + cam.position.y - Gdx.graphics.getHeight / 2 - height / 2
     }
   }
-    
+  
   override def create() {
     super.create()
+    
+    Boro.player = new Boro(this)
     
     inputs.addProcessor(InputManager)
     
     import InputMappings._
     
     // Global mappings
-    shot.appendAction(() => {
-        println("FIRE!")
-        val ball = new Shot(level)
-        ball.x = boro.x
-        ball.y = boro.y
+    cloneShot.appendAction(() => {
+        if (Boro.player.canFire) {
+          Boro.player.canFire = false
+          val ball = new CloneShot(this)
+          ball.x = Boro.player.x
+          ball.y = Boro.player.y
+          
+          followCam.target = ball
       
-        val dir = new Vector2(cursor.x - ball.x, cursor.y - ball.y)
-        val speed = dir.nor.mul(Shot.SPEED)
-        ball.xSpeed = speed.x
-        ball.ySpeed = speed.y
+          val dir = new Vector2(cursor.x - ball.x, cursor.y - ball.y)
+          val speed = dir.nor.mul(Shot.SPEED)
+          ball.xSpeed = speed.x
+          ball.ySpeed = speed.y
         
-        addUpdateable(ball)
-        regularCam.addDrawable(ball)
-    })
+          addUpdateable(ball)
+          regularCam.addDrawable(ball)
+        }
+      })
+    
+    shot.appendAction(() => {
+        if (Boro.player.canFire) {
+          val ball = new Shot(this)
+          ball.x = Boro.player.x
+          ball.y = Boro.player.y
+          
+          val dir = new Vector2(cursor.x - ball.x, cursor.y - ball.y)
+          val speed = dir.nor.mul(Shot.SPEED)
+          ball.xSpeed = speed.x
+          ball.ySpeed = speed.y
+        
+          addUpdateable(ball)
+          regularCam.addDrawable(ball)
+        }
+      })
     
     exit appendAction Gdx.app.exit
     
@@ -65,16 +86,16 @@ class Ouroboros extends Screen {
     
     updateFollowCamRestrictions()
     
-    addUpdateable(boro)
-    regularCam.addDrawable(boro)
+    addUpdateable(Boro.player)
+    regularCam.addDrawable(Boro.player)
     
     addUpdateable(cursor)
     regularCam.addDrawable(cursor)
 
     maxCamPosition.set(level.tileMapRenderer.getMapWidthUnits(), level.tileMapRenderer.getMapHeightUnits())
     
-    boro.x = level.start.x
-    boro.y = level.start.y
+    Boro.player.x = level.start.x
+    Boro.player.y = level.start.y
   }
   
   override def update(elapsed : Long @@ Milliseconds) {
@@ -82,7 +103,7 @@ class Ouroboros extends Screen {
   }
   
   def updateFollowCamRestrictions() {
-    followCam.target = boro
+    followCam.target = Boro.player
     followCam.offset.x = level.map.tileWidth / 2
     followCam.offset.y = level.map.tileHeight / 2
     

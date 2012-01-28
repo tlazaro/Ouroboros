@@ -7,6 +7,8 @@ trait Updateable {
   def update(elapsed : Long @@ Milliseconds) {
 
   }
+  
+  def keepUpdatable: Boolean = true
 }
 
 object Timed {
@@ -92,6 +94,8 @@ trait Drawable {
     }
   }
   
+  def keepDrawable: Boolean = true
+  
   protected def draw(spriteBatch: SpriteBatch)
 }
 
@@ -115,6 +119,7 @@ trait UpdateableParent extends Updateable {
   
   final def updateChildren(elapsed : Long @@ Milliseconds) = {
     updateables foreach (_ update elapsed)
+    updateables filterNot (_.keepUpdatable) foreach removeUpdateable
   }
   
   override def update(elapsed : Long @@ Milliseconds) {
@@ -142,5 +147,6 @@ trait DrawableParent extends Drawable {
   
   final def drawChildren(spriteBatch: SpriteBatch) = {
     drawables foreach (_ redraw spriteBatch)
+    drawables filterNot (_.keepDrawable) foreach removeDrawable
   }
 }

@@ -12,6 +12,7 @@ object InputMappings {
   
   val menu = new GameAction("menu", GameAction.DETECT_INITAL_PRESS_ONLY)
   val action = new GameAction("action", GameAction.DETECT_INITAL_PRESS_ONLY)
+  val cloneShot = new GameAction("clone", GameAction.DETECT_INITAL_PRESS_ONLY)
   val shot = new GameAction("shot", GameAction.DETECT_INITAL_PRESS_ONLY)
   
   val exit = new GameAction("exit", GameAction.DETECT_INITAL_PRESS_ONLY)
@@ -30,10 +31,14 @@ object InputMappings {
   // Special Actions
   InputManager.mapToKey(menu, Input.Keys.M)
   InputManager.mapToKey(menu, Input.Keys.ENTER)
-  InputManager.mapToKey(action, Input.Keys.SPACE)
+  
+  InputManager.mapToKey(shot, Input.Keys.Z)
   InputManager.mapToKey(action, Input.Keys.X)
-  InputManager.mapToKey(shot, Input.Keys.C)
+  InputManager.mapToKey(cloneShot, Input.Keys.C)
+  
   InputManager.mapToMouse(shot, Input.Buttons.LEFT)
+  InputManager.mapToKey(action, Input.Keys.SPACE)
+  InputManager.mapToMouse(cloneShot, Input.Buttons.RIGHT)
   
   // WASD
   InputManager.mapToKey(up, Input.Keys.W)
