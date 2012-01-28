@@ -6,9 +6,9 @@
  <tileset firstgid="50" name="terrain" tilewidth="64" tileheight="64" spacing="2" margin="1">
   <image source="terrenos.png" width="512" height="512"/>
  </tileset>
- <layer name="bottom" width="100" height="20" visible="0">
+ <layer name="bottom" width="100" height="20">
   <data encoding="base64" compression="zlib">
-   eJztwwENAAAMw6B6m39PF3JIWDVVVVVVVVVVff4Ay6gLjw==
+   eJztziEBAAAIA7DXQtO/E7QAMTG/TtIAAKseHAAAAAAA4MoA5AkLhQ==
   </data>
  </layer>
  <layer name="collision" width="100" height="20">
@@ -16,9 +16,9 @@
    eJzt2NEJACAIAFFXa/+lWkFL8T7ugQt4INGJiOOgRvvswWIPFnuw2IOlq4dvgx72YOnYoW/nPu6QxR4sLz28TXOqe/W/ZVZln/6BzXOXLPZgydye7I2y7T97sNhjR+Zt5HDmAqjPVdM=
   </data>
  </layer>
- <layer name="markers" width="100" height="20" visible="0">
+ <layer name="markers" width="100" height="20">
   <data encoding="base64" compression="zlib">
-   eJztzgENAAAIA6Dbv7QxPh0kIAEAAAAAAADgk2kHjlogeAAC
+   eJztzjEJAAAIADC1f2gPKwgibAkWAQAw6joAAAAAALyV1wFY0FBYAAQ=
   </data>
  </layer>
 </map>

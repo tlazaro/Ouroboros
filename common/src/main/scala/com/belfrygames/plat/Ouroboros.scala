@@ -16,8 +16,23 @@ import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
 
 class Ouroboros extends Screen {
-  lazy val mapFile = Gdx.files.internal("res/prueba.tmx")
-  lazy val level = new Level(mapFile, cam)
+  def levelName(n: Int) = "res/level" + n + ".tmx"
+  def existsLevel(n: Int) = Gdx.files.internal(levelName(n)).exists
+  
+  def loadLevel(n: Int) = {
+    level =  new Level(Gdx.files.internal(levelName(n)), cam)
+    Boro.player.x = level.start.x
+    Boro.player.y = level.start.y
+    
+    Boro.clear
+    Shot.clear
+    CloneShot.clear
+    
+    followCam.target = Boro.player
+  }
+  
+  var level: Level = _
+  var currentLevel = 0
   
   lazy val cursor = new Sprite with Particle with Updateable {
     textureRegion = Art.cursor
@@ -32,6 +47,7 @@ class Ouroboros extends Screen {
     super.create()
     
     Boro.player = new Boro(this)
+    loadLevel(currentLevel)
     
     inputs.addProcessor(InputManager)
     
@@ -42,6 +58,7 @@ class Ouroboros extends Screen {
         if (Boro.player.canFire) {
           Boro.player.canFire = false
           val ball = new CloneShot(this)
+          CloneShot.shots ::= ball
           ball.x = Boro.player.x
           ball.y = Boro.player.y
           
@@ -60,6 +77,7 @@ class Ouroboros extends Screen {
     shot.appendAction(() => {
         if (Boro.player.canFire) {
           val ball = new Shot(this)
+          Shot.shots ::= ball
           ball.x = Boro.player.x
           ball.y = Boro.player.y
           
@@ -93,17 +111,27 @@ class Ouroboros extends Screen {
     regularCam.addDrawable(cursor)
 
     maxCamPosition.set(level.tileMapRenderer.getMapWidthUnits(), level.tileMapRenderer.getMapHeightUnits())
-    
-    Boro.player.x = level.start.x
-    Boro.player.y = level.start.y
   }
   
+  
+  val dirToGoal = new Vector2(0.0f, 0.0f)
+  val GOAL_DISTANCE = 64
   override def update(elapsed : Long @@ Milliseconds) {
     super.update(elapsed)
+    
+    dirToGoal.x = Boro.player.x - level.end.x
+    dirToGoal.y = Boro.player.y - level.end.y
+    
+    if (Boro.players.isEmpty && dirToGoal.len2 <= GOAL_DISTANCE * GOAL_DISTANCE) {
+      currentLevel += 1
+      if (existsLevel(currentLevel))
+        loadLevel(currentLevel)
+      else
+        Gdx.app.exit
+    }
   }
   
   def updateFollowCamRestrictions() {
-    followCam.target = Boro.player
     followCam.offset.x = level.map.tileWidth / 2
     followCam.offset.y = level.map.tileHeight / 2
     

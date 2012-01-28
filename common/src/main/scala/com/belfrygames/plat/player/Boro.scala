@@ -5,7 +5,6 @@ import com.belfrygames.plat.Ouroboros
 import com.belfrygames.plat.utils.Loop
 import com.belfrygames.plat.utils.Point2D
 import com.belfrygames.tactics.InputMappings
-import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
 
 abstract class UpdateFunc[T](private[this] val lapse0 : Long @@ Milliseconds) extends Updateable {
@@ -26,6 +25,18 @@ class CountFunc(private[this] val lapse0 : Long @@ Milliseconds,
 object Shot {
   val GRAVITY = -0.005f
   val SPEED = 2
+  
+  var shots = List[Shot]()
+  def removeShot(s: Shot) {
+    s.isAlive = false
+    val (prefix, suffix) = shots splitAt shots.indexOf(s)
+    shots = prefix ++ suffix.tail
+  }
+  
+  def clear() {
+    shots foreach (_.isAlive = false)
+    shots = Nil
+  }
 }
 
 class Shot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
@@ -41,10 +52,10 @@ class Shot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
     
     val p = game.level.globalToLocal(Point2D[Int](xEdge.toInt, yEdge.toInt))
     if (game.level.collides(p)) {
-      isAlive = false
+      Shot.removeShot(this)
     } else {
       Boro.players find (p => (x >= p.x && x <= p.x + p.width && y >= p.y && y <= p.y + p.height)) foreach { p =>
-        isAlive = false
+        Shot.removeShot(this)
         Boro.removePlayer(p)
       }
     }
@@ -57,6 +68,18 @@ class Shot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
 object CloneShot {
   val GRAVITY = -0.005f
   val SPEED = 2
+  
+  var shots = List[CloneShot]()
+  def removeShot(s: CloneShot) {
+    s.isAlive = false
+    val (prefix, suffix) = shots splitAt shots.indexOf(s)
+    shots = prefix ++ suffix.tail
+  }
+  
+  def clear() {
+    shots foreach (_.isAlive = false)
+    shots = Nil
+  }
 }
  
 class CloneShot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
@@ -75,7 +98,8 @@ class CloneShot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
       val spawn = new Boro(game)
       spawn.x = x
       spawn.y = y
-      isAlive = false
+      
+      CloneShot.removeShot(this)
       
       game addUpdateable spawn
       game.regularCam addDrawable spawn
@@ -108,6 +132,11 @@ object Boro {
     val (prefix, suffix) = players splitAt players.indexOf(player)
     players = prefix ++ suffix.tail
   }
+  
+  def clear() {
+    players foreach (_.isAlive = false)
+    players = Nil
+  }
 }
 
 class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
@@ -115,8 +144,8 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
   
   yAccel = Boro.GRAVITY
   
-  val rightFrames = (for(col <- Art.walkRight) yield col(0)).take(8).toList
-  val leftFrames = (for(col <- Art.walkLeft) yield col(0)).take(8).toList
+  val rightFrames = Art.walkRight.toList
+  val leftFrames = Art.walkLeft.toList
   val animfunc = new CountFunc(tag(1000), rightFrames.length)
   
   var frames = rightFrames
@@ -193,6 +222,14 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
       y = dest.y
     } else {
       yAccel = Boro.GRAVITY
+    }
+    
+    if (ySpeed != 0) {
+      textureRegion = if (lookingRight) {
+        Art.jumpRight(2)
+      } else {
+        Art.jumpLeft(2)
+      }
     }
   }
   

@@ -17,6 +17,7 @@ object Level {
   val COLLISION = "collision"
   val MARKERS = "markers"
   val PLAYER_START = 0
+  val PLAYER_END = 1
   
   val SOLID = 15
 }
@@ -28,6 +29,7 @@ class Level (private[this] val file0: FileHandle, val camera : OrthographicCamer
   
   val collision = Array.ofDim[Int](map.width, map.height)
   var start: Point2D[Int] = _
+  var end: Point2D[Int] = _
   
   init()
   private def init() {
@@ -44,8 +46,10 @@ class Level (private[this] val file0: FileHandle, val camera : OrthographicCamer
             for(layer <- markers) {
               for(y <- 0 until layer.tiles.size; x <- 0 until layer.tiles(0).size) {
                 val tile = layer.tiles(y)(x) - gid
-                if (tile == Level.PLAYER_START) {
-                  start = localToGlobal(Point2D(x, y))
+                tile match {
+                  case Level.PLAYER_START => start = localToGlobal(Point2D(x, y))
+                  case Level.PLAYER_END => end = localToGlobal(Point2D(x, y))
+                  case _ =>
                 }
               }
             }

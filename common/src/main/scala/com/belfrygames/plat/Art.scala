@@ -9,11 +9,14 @@ object Art {
   lazy val menu = load("res/gui.png", 58, 58)
   lazy val menuCursor = load("res/gui.png", 18, 18, 60, 1)
   lazy val font = new BitmapFont
-  lazy val left = load("res/left.png")
-  lazy val right = load("res/right.png")
-  lazy val walkRight = split("res/walkRight.png", 64, 138, 1, 1, false, false)
-  lazy val walkLeft = split("res/walkLeft.png", 68, 146, 1, 1, false, false)
   lazy val cursor = load("res/cursor.png")
+  lazy val boro = split("res/boro.png", 100, 150, 1, 1, false, false)
+  lazy val walkRight = boro(0).take(8)
+  lazy val walkLeft = boro(1).take(8)
+  lazy val jumpRight = boro(2).take(3)
+  lazy val right = jumpRight(0)
+  lazy val jumpLeft = boro(2).drop(3).take(3)
+  lazy val left = jumpLeft(0)
   
   def load () {
     font; menu; menuCursor; left; right; walkRight; walkLeft
@@ -23,10 +26,10 @@ object Art {
     val texture = new Texture(Gdx.files.internal(name))
     val xSlices = texture.getWidth() / width
     val ySlices = texture.getHeight() / height
-    val res = Array.ofDim[TextureRegion](xSlices, ySlices)
+    val res = Array.ofDim[TextureRegion](ySlices, xSlices)
     for (x <- 0 until xSlices; y <- 0 until ySlices) {
-      res(x)(y) = new TextureRegion(texture, x * width, y * height, width, height)
-      res(x)(y).flip(flipX, flipY)
+      res(y)(x) = new TextureRegion(texture, x * width, y * height, width, height)
+      res(y)(x).flip(flipX, flipY)
     }
     res
   }
@@ -39,11 +42,11 @@ object Art {
     val texture = new Texture(Gdx.files.internal(name))
     val xSlices = texture.getWidth() / width
     val ySlices = texture.getHeight() / height
-    val res = Array.ofDim[TextureRegion](xSlices, ySlices)
+    val res = Array.ofDim[TextureRegion](ySlices, xSlices)
     for (x <- 0 until xSlices; y <- 0 until ySlices) {
       val coords = indexToPos(x, y)
-      res(x)(y) = new TextureRegion(texture, coords._1, coords._2, width, height)
-      res(x)(y).flip(flipX, flipY)
+      res(y)(x) = new TextureRegion(texture, coords._1, coords._2, width, height)
+      res(y)(x).flip(flipX, flipY)
     }
     
     res
