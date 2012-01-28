@@ -1,0 +1,65 @@
+<project default="default" name="desktop">
+    <description>Builds, tests, and runs the project sbt-netbeans-plugin.</description>
+    <import file="nbproject/build-impl.xml"></import>
+
+    <target description="Clean build products." name="clean">
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;clean"></arg>
+        </exec>
+    </target>
+
+    <target description="Build JAR." name="jar">
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;;package;package-src"></arg>
+        </exec>
+    </target>
+
+    <target description="Compile project." name="compile">
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;compile"></arg>
+        </exec>
+    </target>
+
+    <target description="Run unit tests." name="test">
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;test"></arg>
+        </exec>
+    </target>
+    
+    <target name="run-single">
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;run-main ${run.class}"></arg>
+        </exec>        
+    </target>
+    
+    <target description="Run a main class." name="run">
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros"/>
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;run"></arg>
+        </exec>
+        <exec executable="sbt-hack" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project common;~compile"></arg>
+        </exec>
+    </target>       
+    
+    <target name="debug-single">
+        <echo>
+            Add -Xrunjdwp:transport=dt_socket,address={jpda.address} as an argument
+            to the SBT (specifying desired `jpda.address`), attach debugger and run the file.
+        </echo>
+    </target>    
+    
+    <target description="Debug project in IDE." name="debug">
+        <echo>
+            Add -Xrunjdwp:transport=dt_socket,address={jpda.address} as an argument
+            to the SBT (specifying desired `jpda.address`), attach debugger and run the project.
+        </echo>        
+    </target>  
+    
+    <target name="-javadoc-build">
+        <exec executable="sbt" dir="/home/tomas/NetbeansProjects/Ouroboros">
+            <arg value=";project desktop;package-doc"></arg>
+        </exec>        
+    </target>        
+
+</project>

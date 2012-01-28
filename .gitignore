@@ -1,0 +1,27 @@
+#java specific
+*.class
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+# SBT target
+project/target/
+common/target/
+desktop/target/
+android/target/
+target/
+
+# Netbeans ignore stuff
+.sbt-hack-lock
+/common/nbproject/private/
+/common/build/
+/desktop/nbproject/private/
+/desktop/build/
+/resources/nbproject/private/
+/resources/build/
+/project/nbproject/private/
+/project/build/
