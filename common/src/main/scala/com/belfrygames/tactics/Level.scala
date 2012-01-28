@@ -54,11 +54,11 @@ class Level (private[this] val file0: FileHandle, val camera : OrthographicCamer
               }
             }
           }
-        case "terrain" => {
+        case "cave" => {
             for(layer <- collisionLayer) {
               for(y <- 0 until layer.tiles.size; x <- 0 until layer.tiles(0).size) {
                 val tile = layer.tiles(y)(x) - gid
-                if (tile == Level.SOLID) {
+                if (0 <= tile && tile <= Level.SOLID) {
                   collision(x)(y) = 1
                 }
               }

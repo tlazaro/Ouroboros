@@ -18,6 +18,9 @@ object Art {
   lazy val jumpLeft = boro(2).drop(3).take(3)
   lazy val left = jumpLeft(0)
   
+  lazy val spitRight = split("res/spitRight.png", 102, 143, 1, 1, false, false)(0).take(6)
+  lazy val spitLeft = split("res/spitLeft.png", 102, 143, 1, 1, false, false)(0).take(6)
+  
   def load () {
     font; menu; menuCursor; left; right; walkRight; walkLeft
   }

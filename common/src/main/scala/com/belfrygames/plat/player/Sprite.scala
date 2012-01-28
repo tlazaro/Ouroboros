@@ -24,8 +24,8 @@ trait Sprite extends Drawable with Spatial {
   
   def north = Point2D(x + width / 2, y + height)
   def south = Point2D(x + width / 2, y)
-  def east = Point2D(x, y + height / 2)
-  def west = Point2D(x + width, y + height / 2)
+  def east = Point2D(x + width, y + height / 2)
+  def west = Point2D(x, y + height / 2)
   
   def center = Point2D(x + width / 2, y + height / 2)
 }

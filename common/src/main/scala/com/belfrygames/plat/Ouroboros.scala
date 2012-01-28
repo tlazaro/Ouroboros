@@ -58,38 +58,13 @@ class Ouroboros extends Screen {
     // Global mappings
     cloneShot.appendAction(() => {
         if (Boro.player.canFire) {
-          Boro.player.canFire = false
-          val ball = new CloneShot(this)
-          CloneShot.shots ::= ball
-          ball.x = Boro.player.x
-          ball.y = Boro.player.y
-          
-          followCam.target = ball
-      
-          val dir = new Vector2(cursor.x - ball.x, cursor.y - ball.y)
-          val speed = dir.nor.mul(Shot.SPEED)
-          ball.xSpeed = speed.x
-          ball.ySpeed = speed.y
-        
-          addUpdateable(ball)
-          regularCam.addDrawable(ball)
+          Boro.player.shoot(true)
         }
       })
     
     shot.appendAction(() => {
         if (Boro.player.canFire) {
-          val ball = new Shot(this)
-          Shot.shots ::= ball
-          ball.x = Boro.player.x
-          ball.y = Boro.player.y
-          
-          val dir = new Vector2(cursor.x - ball.x, cursor.y - ball.y)
-          val speed = dir.nor.mul(Shot.SPEED)
-          ball.xSpeed = speed.x
-          ball.ySpeed = speed.y
-        
-          addUpdateable(ball)
-          regularCam.addDrawable(ball)
+          Boro.player.shoot(false)
         }
       })
     

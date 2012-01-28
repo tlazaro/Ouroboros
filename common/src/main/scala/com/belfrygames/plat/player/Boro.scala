@@ -1,5 +1,6 @@
 package com.belfrygames.plat.player
 
+import com.badlogic.gdx.math.Vector2
 import com.belfrygames.plat.Art
 import com.belfrygames.plat.Ouroboros
 import com.belfrygames.plat.utils.Loop
@@ -51,13 +52,15 @@ class Shot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
     val yEdge = ySpeed + y + (if (ySpeed > 0) height else 0)
     
     val p = game.level.globalToLocal(Point2D[Int](xEdge.toInt, yEdge.toInt))
-    if (game.level.collides(p)) {
-      Shot.removeShot(this)
-    } else {
-      Boro.players find (p => (x >= p.x && x <= p.x + p.width && y >= p.y && y <= p.y + p.height)) foreach { p =>
-        Shot.removeShot(this)
-        Boro.removePlayer(p)
-      }
+    
+    Boro.players find (p => (x >= p.x && x <= p.x + p.width && y >= p.y && y <= p.y + p.height)) match {
+      case Some(p) => {
+          Shot.removeShot(this)
+          Boro.removePlayer(p)
+        }
+      case _ => if (game.level.collides(p)) {
+          Shot.removeShot(this)
+        }
     }
   }
   
@@ -115,7 +118,7 @@ class CloneShot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
 }
 
 object Boro {
-  val SPEED = 1.0f 
+  val SPEED = 0.5f 
   val GRAVITY = -0.015f
   val JUMP_SPEED = 3f
   
@@ -148,13 +151,62 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
   val leftFrames = Art.walkLeft.toList
   val animfunc = new CountFunc(tag(1000), rightFrames.length)
   
+  val spitRightFrames = Art.spitRight.toList
+  val spitLeftFrames = Art.spitLeft.toList
+  val shootFunc = new CountFunc(tag(500), spitRightFrames.length)
+  
   var frames = rightFrames
   var lookingRight = true
   
   var canFire = true
-  
+  var spitting = false
+  var lastFrame = -1
+  var cloning = false
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
+    
+    if (spitting) {
+      shootFunc update elapsed
+      val nextFrame = shootFunc()
+      if (lastFrame > nextFrame) {
+        spitting = false
+        lastFrame = -1
+        frames = rightFrames
+        
+        var sprite = if (cloning) {
+          val ball = new CloneShot(game)
+          CloneShot.shots ::= ball
+          game.followCam.target = ball
+          ball
+        } else {
+          val ball = new Shot(game)
+          Shot.shots ::= ball
+          ball
+        }
+        
+        val origin = north
+        sprite.x = origin.x - sprite.width / 2
+        sprite.y = origin.y - sprite.height / 2 - 40
+
+        val dir = new Vector2(game.cursor.x - sprite.x, game.cursor.y - sprite.y)
+        val speed = dir.nor.mul(Shot.SPEED)
+        sprite.xSpeed = speed.x
+        sprite.ySpeed = speed.y
+
+        game.addUpdateable(sprite)
+        game.regularCam.addDrawable(sprite)
+        
+        Boro.player.canFire = true
+      } else {
+        lastFrame = nextFrame
+        textureRegion = frames(lastFrame)
+        
+        xSpeed = 0
+        ySpeed = 0
+        yAccel = 0
+        return
+      }
+    }
     
     animfunc update elapsed
     
@@ -233,7 +285,56 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
     }
   }
   
+  def shoot(cloning: Boolean) {
+    this.cloning = cloning
+    Boro.player.canFire = false
+    frames = spitRightFrames
+    spitting = true
+  }
+  
   var isAlive = true
   override def keepUpdatable = isAlive
   override def keepDrawable = isAlive
+  
+  /**
+   if (xSpeed == 0) {
+   textureRegion = if (lookingRight) Art.right else Art.left
+   } else {
+   val p = if (xSpeed > 0) east else west
+   val pX = game.level.globalToLocal((p.x + xSpeed).toInt, p.y.toInt)
+   if (game.level.collides(pX)) {
+   xSpeed = 0
+   }
+   }
+    
+   val (airLeft, airRight) = if (ySpeed > 0) { (topLeft, topRight) } else { (bottomLeft, bottomRight) }
+   val p1 = game.level.globalToLocal((airLeft.x + xSpeed).toInt, (airLeft.y + ySpeed).toInt)
+   val p2 = game.level.globalToLocal((airRight.x + xSpeed).toInt, (airRight.y + ySpeed).toInt)
+   if (game.level.collides(p1) || game.level.collides(p2)) {
+   val dir = if (ySpeed > 0) 1 else -1
+      
+   ySpeed = 0
+   yAccel = 0
+      
+   var newY = p1.y
+   do {
+   newY += dir
+   } while(newY >= 0 && newY < game.level.map.height &&
+   (game.level.collides(Point2D[Int](p1.x, newY)) ||
+   game.level.collides(Point2D[Int](p2.x, newY))))
+      
+   val dest = game.level.localToGlobal(p1.x, newY)
+   y = dest.y
+   } else {
+   yAccel = Boro.GRAVITY
+   }
+    
+   if (ySpeed != 0) {
+   textureRegion = if (lookingRight) {
+   Art.jumpRight(2)
+   } else {
+   Art.jumpLeft(2)
+   }
+   } 
+   */
 }
