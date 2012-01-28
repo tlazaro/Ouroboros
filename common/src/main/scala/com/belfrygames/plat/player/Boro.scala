@@ -1,9 +1,10 @@
 package com.belfrygames.plat.player
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.belfrygames.plat.Art
 import com.belfrygames.plat.utils.Loop
+import com.belfrygames.plat.utils.Point2D
 import com.belfrygames.tactics.InputMappings
+import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
 
 abstract class UpdateFunc[T](private[this] val lapse0 : Long @@ Milliseconds) extends Updateable {
@@ -27,11 +28,10 @@ object Boro {
   val JUMP_SPEED = 4f
 }
 
-class Boro extends Sprite with AcceleratedUpdateable {
+class Boro(val level: Level) extends Sprite with AcceleratedUpdateable {
   textureRegion = Art.right
   
   yAccel = Boro.GRAVITY
-  
   
   val rightFrames = (for(col <- Art.walkRight) yield col(0)).take(8).toList
   val leftFrames = (for(col <- Art.walkLeft) yield col(0)).take(8).toList
@@ -79,6 +79,32 @@ class Boro extends Sprite with AcceleratedUpdateable {
     
     if (xSpeed == 0) {
       textureRegion = if (lookingRight) Art.right else Art.left
+    }
+    
+    var nextX = x + xSpeed + (if (xSpeed > 0) textureRegion.getRegionWidth else 0)
+    val pX = level.globalToLocal(Point2D[Int](nextX.toInt, y.toInt + textureRegion.getRegionHeight / 2))
+    if (level.collides(pX)) {
+      xSpeed = 0
+    }
+    
+    nextX = x + xSpeed + textureRegion.getRegionWidth / 2
+    var nextY = y + ySpeed + (if (ySpeed > 0) textureRegion.getRegionHeight else 0)
+    val p = level.globalToLocal(Point2D[Int](nextX.toInt, nextY.toInt))
+    if (level.collides(p)) {
+      val dir = if (ySpeed > 0) 1 else -1
+      
+      ySpeed = 0
+      yAccel = 0
+      
+      var newY = p.y
+      do {
+        newY += dir
+      } while(level.collides(Point2D[Int](p.x, newY)))
+      
+      val dest = level.localToGlobal(p.x, newY)
+      y = dest.y
+    } else {
+      yAccel = Boro.GRAVITY
     }
   }
 }

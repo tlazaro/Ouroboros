@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.belfrygames.core.Screen
 import com.belfrygames.input.InputManager
 import com.belfrygames.plat.player.Boro
-import com.belfrygames.plat.player.Updateable
 import com.belfrygames.tactics.InputMappings
 import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
@@ -14,20 +13,13 @@ class Ouroboros extends Screen {
   lazy val mapFile = Gdx.files.internal("res/prueba.tmx")
   lazy val level = new Level(mapFile, cam)
   
-  lazy val boro = new Boro
+  lazy val boro = new Boro(level)
   override def create() {
     super.create()
     
     inputs.addProcessor(InputManager)
     
     import InputMappings._
-    
-    // Player Mappings
-//    up appendAction { }
-//    down appendAction cursor.moveDown
-    left appendAction { () => boro.xSpeed = -Boro.SPEED }
-    right appendAction { () => boro.xSpeed = Boro.SPEED }
-//    action appendAction cursor.action
     
     // Global mappings
     exit appendAction Gdx.app.exit
