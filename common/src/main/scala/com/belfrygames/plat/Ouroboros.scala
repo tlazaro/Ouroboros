@@ -38,8 +38,8 @@ class Ouroboros extends Screen {
     textureRegion = Art.cursor
     
     override def update(elapsed : Long @@ Milliseconds) {
-      x = InputManager.x + cam.position.x - Gdx.graphics.getWidth / 2 - width / 2
-      y = InputManager.y + cam.position.y - Gdx.graphics.getHeight / 2 - height / 2
+      x = cam.zoom * InputManager.x + cam.position.x - cam.zoom * Gdx.graphics.getWidth / 2 - width / 2
+      y = cam.zoom * InputManager.y + cam.position.y - cam.zoom * Gdx.graphics.getHeight / 2- height / 2
     }
   }
   
@@ -50,6 +50,8 @@ class Ouroboros extends Screen {
     loadLevel(currentLevel)
     
     inputs.addProcessor(InputManager)
+    
+    cam.zoom = 2.0f
     
     import InputMappings._
     

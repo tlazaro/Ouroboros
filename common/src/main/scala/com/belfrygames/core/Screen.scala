@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.belfrygames.plat.player.UpdateableParent
 import com.belfrygames.plat.player.DrawableParent
+import com.belfrygames.plat.utils.Point2D
 import com.belfrygames.plat.utils.StopWatch
 import com.belfrygames.utils._
 import com.badlogic.gdx.math.Vector2
@@ -108,6 +109,19 @@ class Screen extends ApplicationListener with DrawableParent with UpdateablePare
   
   override protected def draw(spriteBatch: SpriteBatch) {
     drawChildren(spriteBatch)
+  }
+  
+  def screenToCamera(x: Int, y: Int) = {
+    //TODO
+//    resizePolicy match {
+//      case Screen.FitScreen => if (width >= height) (height * Config.WIDTH / Config.HEIGHT, height) else (width, width * Config.WIDTH / Config.HEIGHT)
+//      case Screen.Stretch => Point2D((p.x * Config.WIDTH / Gdx.graphics.getWidth) , (p.y * Config.HEIGHT / Gdx.graphics.getHeight))
+//      case Screen.Original => {
+//          val x = if(p.x <= Config.WIDTH)
+//          (Config.WIDTH, Config.HEIGHT)
+//      }
+//    }
+    Point2D((x * Config.WIDTH / Gdx.graphics.getWidth) * cam.zoom, (y * Config.HEIGHT / Gdx.graphics.getHeight) * cam.zoom)
   }
   
   def draw() {

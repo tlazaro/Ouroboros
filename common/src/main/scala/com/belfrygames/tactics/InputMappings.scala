@@ -41,13 +41,13 @@ object InputMappings {
   InputManager.mapToMouse(cloneShot, Input.Buttons.RIGHT)
   
   // WASD
-  InputManager.mapToKey(up, Input.Keys.W)
+  InputManager.mapToKey(action, Input.Keys.W)
   InputManager.mapToKey(left, Input.Keys.A)
   InputManager.mapToKey(down, Input.Keys.S)
   InputManager.mapToKey(right, Input.Keys.D)
   
   // Arrows
-  InputManager.mapToKey(up, Input.Keys.UP)
+  InputManager.mapToKey(action, Input.Keys.UP)
   InputManager.mapToKey(left, Input.Keys.LEFT)
   InputManager.mapToKey(down, Input.Keys.DOWN)
   InputManager.mapToKey(right, Input.Keys.RIGHT)

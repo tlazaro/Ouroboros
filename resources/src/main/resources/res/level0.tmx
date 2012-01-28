@@ -13,7 +13,7 @@
  </layer>
  <layer name="collision" width="100" height="20">
   <data encoding="base64" compression="zlib">
-   eJzt2NEJACAIAFFXa/+lWkFL8T7ugQt4INGJiOOgRvvswWIPFnuw2IOlq4dvgx72YOnYoW/nPu6QxR4sLz28TXOqe/W/ZVZln/6BzXOXLPZgydye7I2y7T97sNhjR+Zt5HDmAqjPVdM=
+   eJzt2dEJACAIAFFXa/+lWkFL8T7ugQt4EFEnIo6DGu2zB4s9WOzBYg+Wrh7eDXrYg6Vjh96d+7hDFnuwvPTwbJpT3avvLbMq+/QNbJ67ZLEHS6ZH9oyy7T97sNhjR+Wf0NmfC341Usc=
   </data>
  </layer>
  <layer name="markers" width="100" height="20">
