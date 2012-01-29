@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 object Art {
+  lazy val splash = load("res/logo.png")
   lazy val menu = load("res/gui.png", 58, 58)
   lazy val menuCursor = load("res/gui.png", 18, 18, 60, 1)
   lazy val font = new BitmapFont

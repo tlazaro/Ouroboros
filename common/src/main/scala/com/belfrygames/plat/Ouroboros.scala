@@ -95,6 +95,7 @@ class Ouroboros extends Screen {
   
   var level: Level = _
   var currentLevel = 0
+  var mainMenu = true
   
   lazy val cursor = new Sprite with Particle with Updateable {
     textureRegion = Art.cursor
@@ -112,8 +113,12 @@ class Ouroboros extends Screen {
   override def create() {
     super.create()
     
-    Sound.soundtrack.play
-    Sound.soundtrack.setLooping(true)
+    val splash = new Sprite with Particle {
+      textureRegion = Art.splash
+    }
+    
+    Sound.menu.play
+    Sound.menu.setLooping(true)
     
     addUpdateable(new Updateable {
         override def update (elapsed: Long @@ Milliseconds) {
@@ -139,8 +144,14 @@ class Ouroboros extends Screen {
       })
     
     shot.appendAction(() => {
-        if (Boro.player.canFire) {
-          Boro.player.shoot(false)
+        if (mainMenu) {
+          mainMenu = false
+          splash.visible = false
+          Sound.menu.stop
+          Sound.soundtrack.play
+          Sound.soundtrack.setLooping(true)
+        } else if (Boro.player.canFire) {
+            Boro.player.shoot(false)
         }
       })
     
@@ -188,6 +199,8 @@ class Ouroboros extends Screen {
     regularCam.addDrawable(cursor)
 
     maxCamPosition.set(level.tileMapRenderer.getMapWidthUnits(), level.tileMapRenderer.getMapHeightUnits())
+    
+    hudCam.addDrawable(splash)
   }
   
   def screenToCam(x: Float) = (x * cam.zoom / 64) - 1
