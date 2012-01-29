@@ -31,35 +31,44 @@ class Ouroboros extends Screen {
   
   val contactListener = new ContactListener() {
     def beginContact(contact: Contact) {
-      if (!contact.isTouching) return
-          
-      val aBody = contact.getFixtureA.getBody
-      val bBody = contact.getFixtureB.getBody
-          
-      if (aBody != Boro.player.body && bBody != Boro.player.body) {
-        Shot.shots.find(s => (aBody == s.body) || (bBody == s.body)) match {
-          case Some(s) => {
-              if (s.contact == null)
-                s.contact = contact
-            }
-          case _ => CloneShot.shots.find(s => aBody == s.body || bBody == s.body) match {
-              case Some(s) => {
-                  if (s.contact == null)
-                    s.contact = contact
-                }
-              case _ =>
-            }
-        }
-      }
+      
     }
     def endContact(contact: Contact) {
           
     }
+    
     def postSolve(contact: Contact, impulse: ContactImpulse) {
+      if (!contact.isTouching) return
           
+      val aBody = contact.getFixtureA.getBody
+      val bBody = contact.getFixtureB.getBody
+      
+      aBody.getUserData match {
+        case p : Boro if p == Boro.player => 
+        case p : Boro => bBody.getUserData match {
+            case s: Shot => s.contact = contact
+            case s: CloneShot => s.contact = contact
+            case _ =>
+          }
+        case s: Shot => bBody.getUserData match {
+            case p : Boro if p == Boro.player => 
+            case p : Boro => s.contact = contact
+            case _ => s.contact = contact
+          }
+        case s: CloneShot => bBody.getUserData match {
+            case p : Boro if p == Boro.player => 
+            case p : Boro => s.contact = contact
+            case _ => s.contact = contact
+          }
+        case x => bBody.getUserData match {
+            case s: Shot => s.contact = contact
+            case s: CloneShot => s.contact = contact
+            case _ =>
+          }
+      }
     }
+    
     def preSolve(contact: Contact, oldManifold: Manifold) {
-          
     }
   }
   

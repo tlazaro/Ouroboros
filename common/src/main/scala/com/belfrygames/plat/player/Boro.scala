@@ -56,9 +56,9 @@ class PhysicObject(val game: Ouroboros) {
     createBody(p, 0)
   }
   
-  def createBody(p: Point2D[Float], res: Float = 1) {
+  def createBody(p: Point2D[Float], res: Float = 0.3f) {
     val builder = new BodyBuilder(game.box2d)
-    body = builder.fixture(builder.fixtureDefBuilder.circleShape(1).restitution(res)).position(p.x, p.y).`type`(BodyType.DynamicBody).build
+    body = builder.fixture(builder.fixtureDefBuilder.circleShape(1).restitution(res)).position(p.x, p.y).`type`(BodyType.DynamicBody).userData(this).build
     x = game.camToScreen(body.getPosition.x) + width / 2
     y = game.camToScreen(body.getPosition.y) + height / 2
   }
@@ -74,15 +74,14 @@ class Shot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
     x = game.camToScreen(body.getPosition.x) + width / 2
     y = game.camToScreen(body.getPosition.y) + height / 2
     
-    if (contact != null) {
-      val aBody = contact.getFixtureA.getBody
-      val bBody = contact.getFixtureB.getBody
-          
-      Boro.players find (p => aBody == p.body || bBody == p.body) match {
-        case Some(p) => p.kill
-        case _ =>
-      }
+    val speed = body.getLinearVelocity
+    if (math.abs(speed.x) < Boro.EPSILON && math.abs(speed.y) < Boro.EPSILON) {
       Shot.removeShot(this)
+    } else {
+      Boro.players.find(p => math.abs(p.x - x) < 100 && math.abs(p.y - y) < 100) foreach {p =>
+        p.kill()
+        Shot.removeShot(this)
+      }
     }
   }
   
