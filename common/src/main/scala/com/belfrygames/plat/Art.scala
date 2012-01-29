@@ -30,6 +30,9 @@ object Art {
   lazy val spitRight = split("res/spitRight.png", 102, 143, 1, 1, false, false)(0).take(6)
   lazy val spitLeft = split("res/spitLeft.png", 102, 143, 1, 1, false, false)(0).take(6)
   
+  lazy val attackRight = split("res/ataque.png", 84, 143, 1, 1, false, false)(0).take(4)
+  lazy val attackLeft = split("res/ataque.png", 84, 143, 1, 1, false, false)(1).take(4)
+  
   def load () {
     font; menu; menuCursor; left; right; walkRight; walkLeft
   }

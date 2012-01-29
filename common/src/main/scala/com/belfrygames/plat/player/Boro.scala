@@ -191,6 +191,10 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
   val spitLeftFrames = Art.spitLeft.toList
   val shootFunc = new CountFunc(tag(500), spitRightFrames.length)
   
+  val attackRightFrames = Art.attackRight.toList
+  val attackLeftFrames = Art.attackLeft.toList
+  val attackFunc = new CountFunc(tag(500), attackRightFrames.length)
+  
   val birthFrames = Art.birth.toList
   val birthFunc = new CountFunc(tag(500), birthFrames.length)
   
@@ -257,8 +261,12 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
     }
     
     if (spitting) {
-      shootFunc update elapsed
-      val nextFrame = shootFunc()
+      if (cloning) {
+        shootFunc update elapsed
+      } else {
+        attackFunc update elapsed
+      }
+      val nextFrame = if (cloning) shootFunc() else attackFunc()
       if (lastFrame > nextFrame) {
         spitting = false
         lastFrame = -1
@@ -366,7 +374,11 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
   def shoot(cloning: Boolean) {
     this.cloning = cloning
     Boro.player.canFire = false
-    frames = if (game.cursor.x >= x) spitRightFrames else spitLeftFrames
+    if (cloning) {
+      frames = if (game.cursor.x >= x) spitRightFrames else spitLeftFrames
+    } else {
+      frames = if (game.cursor.x >= x) attackRightFrames else attackLeftFrames
+    }
     spitting = true
     Sound.shot.play
   }
