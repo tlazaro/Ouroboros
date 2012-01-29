@@ -94,7 +94,7 @@ class Ouroboros extends Screen {
   }
   
   var level: Level = _
-  var currentLevel = 1
+  var currentLevel = 0
   
   lazy val cursor = new Sprite with Particle with Updateable {
     textureRegion = Art.cursor

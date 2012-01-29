@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="41" height="20" tilewidth="64" tileheight="64">
+<map version="1.0" orientation="orthogonal" width="41" height="21" tilewidth="64" tileheight="64">
  <tileset firstgid="1" name="markers" tilewidth="64" tileheight="64" spacing="1" margin="1">
   <image source="markers.png" trans="ff00ff" width="456" height="456"/>
  </tileset>
- <tileset firstgid="50" name="terrain" tilewidth="64" tileheight="64" spacing="2" margin="1">
-  <image source="terrenos.png" width="512" height="512"/>
- </tileset>
- <tileset firstgid="99" name="cave" tilewidth="64" tileheight="64" spacing="2" margin="1">
+ <tileset firstgid="50" name="cave" tilewidth="64" tileheight="64" spacing="2" margin="1">
   <image source="tiles.png" width="512" height="512"/>
  </tileset>
- <layer name="bottom" width="41" height="20">
+ <tileset firstgid="99" name="back" tilewidth="64" tileheight="64">
+  <image source="pared.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="100" name="portal" tilewidth="64" tileheight="64">
+  <image source="portal01.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="101" name="portal2" tilewidth="64" tileheight="64">
+  <image source="portal02.png" width="64" height="64"/>
+ </tileset>
+ <layer name="bottom" width="41" height="21">
   <data encoding="base64" compression="zlib">
-   eJztziEBAAAIA7DXQtO/E4YASMTE/DpJAwAArHpwuBrbUNaT
+   eJztzjERACAMBLBqqiXAvwUk0In7IUP2dFV1uAUAAHyzAw4vJ+AwdQG9UUUx
   </data>
  </layer>
- <layer name="collision" width="41" height="20">
+ <layer name="collision" width="41" height="21">
   <data encoding="base64" compression="zlib">
-   eJzVVtEOhCAM41+NZ0z05U7/X01cMndzdiMBbNInQCpdB11KqWucw85fgJ+HtWNw7G6fCOgb1nhkTCJHYym8ReNRkz3jVFXRP0gjZed7siWQ17W1zenqJSedX22sjNxb7jEK7X+1+kXnaVgEvbnW1i7APDqPSCZzeg9pQObJbHpQqj9KnZ6zLNnDZRZQ3y2Nsu5ze3s0r5ZGmS+k9rwaEd9reo3qbEWjVZ8tabzTqr17vPmw7lptL5T8vt4A2sdv0w==
+   eJzVVtEOhCAM45uMZ0z05U7//5vUxCVzN2c3EsAmfQKk0nWQUvvoXsBh5y/Az8PaMTh2t08E9A1rPDImkaOxFN6i8ajJnnGqqugfpJGy8z3ZEsjr2trmdPWSk86vNlZG7i33GIX2v1r9ovM0LILeXGtrF2AenUckkzm9hzQg82Q2PSjVH6VOz1mW7OEyC6jvlkZZ97m9PZpXS6PMF1J7Xo2I7zW9RnW2otGqz5Y03mnV3j3efFh3rbYXSn5fb2wkO2E=
   </data>
  </layer>
- <layer name="markers" width="41" height="20">
+ <layer name="markers" width="41" height="21">
   <data encoding="base64" compression="zlib">
-   eJztziEBAAAIAzCgf2gSIFA3W4JVAQAACZ0OHCYdeFgPbAAE
+   eJztzjEBAAAEADD0D60Ah8uzJVgEAADALL8Di/oOHDQQEAAE
   </data>
  </layer>
 </map>

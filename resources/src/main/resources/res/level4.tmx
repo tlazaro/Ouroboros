@@ -3,20 +3,26 @@
  <tileset firstgid="1" name="markers" tilewidth="64" tileheight="64" spacing="1" margin="1">
   <image source="markers.png" trans="ff00ff" width="456" height="456"/>
  </tileset>
- <tileset firstgid="50" name="terrain" tilewidth="64" tileheight="64" spacing="2" margin="1">
-  <image source="terrenos.png" width="512" height="512"/>
- </tileset>
- <tileset firstgid="99" name="cave" tilewidth="64" tileheight="64" spacing="2" margin="1">
+ <tileset firstgid="50" name="cave" tilewidth="64" tileheight="64" spacing="2" margin="1">
   <image source="tiles.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="99" name="back" tilewidth="64" tileheight="64">
+  <image source="pared.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="100" name="portal" tilewidth="64" tileheight="64">
+  <image source="portal01.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="101" name="portal2" tilewidth="64" tileheight="64">
+  <image source="portal02.png" width="64" height="64"/>
  </tileset>
  <layer name="bottom" width="41" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUkAKcKcSjbhx146gbh48bLYeAG4dCOI66cdSNo24cdSMlAAB1Xj7H
+   eJxjYBgFo2AUkAKSKcSjbhx146gbicMpQ8CNqUPAjUMhrkfdOOrGUTeOupESAAAC91zU
   </data>
  </layer>
  <layer name="collision" width="41" height="20">
   <data encoding="base64" compression="zlib">
-   eJztls0KgDAMg/uu6kT8O/j+oEUKI0zpBmYe9kEOnR2G1QxFGo1GDt2L+ki4ZnUtj+phhL4Aa0HqeTQfB/RpPUEdPnd3g+eH3mLwGdsjztYD06NlYMvcy/L49P15YHv0sF4aIjFzvTj6dknflwz0PXPBPubdU5Jng5lrz6xTMM+xJNPK32aNmWbm2uvR/iFQDE5smSZR
+   eJztlksKgDAMRHMmtSL+Ft7/UBokUIYqacGpiz6YRWqKQ+MURRqNRg7di/pIuGZ1LY/qYYS+AGtB6nk0Hwf0aT1BHT53d4Pnh95i8BnbI87WA9OjZWDL3Mvy+PT9eWB79LBeGiIxc704+nZJ35cM9D1zwT7m3VOSZ4OZa8+sUzDPsSTTyt9mjZlm5trr0f4hUAxOFRYT8Q==
   </data>
  </layer>
  <layer name="markers" width="41" height="20">
