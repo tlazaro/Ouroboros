@@ -17,6 +17,8 @@ object InputMappings {
   
   val jump = new GameAction("jump", GameAction.NORMAL)
   
+  val restart = new GameAction("restart", GameAction.DETECT_INITAL_PRESS_ONLY)
+  
   val exit = new GameAction("exit", GameAction.DETECT_INITAL_PRESS_ONLY)
   val pause = new GameAction("pause", GameAction.DETECT_INITAL_PRESS_ONLY)
   val zoomin = new GameAction("zoomin", GameAction.DETECT_INITAL_PRESS_ONLY)
@@ -26,6 +28,7 @@ object InputMappings {
   
   // System
   InputManager.mapToKey(exit, Input.Keys.ESCAPE)
+  InputManager.mapToKey(restart, Input.Keys.R)
   InputManager.mapToKey(pause, Input.Keys.P)
   InputManager.mapToKey(zoomin, Input.Keys.PLUS)
   InputManager.mapToKey(zoomout, Input.Keys.MINUS)

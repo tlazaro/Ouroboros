@@ -29,7 +29,6 @@ class CountFunc(private[this] val lapse0 : Long @@ Milliseconds,
 }
 
 object Shot {
-  val GRAVITY = -0.005f
   val SPEED = 2
   
   var shots = List[Shot]()
@@ -90,7 +89,6 @@ class Shot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
 }
 
 object CloneShot {
-  val GRAVITY = -0.005f
   val SPEED = 2
   
   var shots = List[CloneShot]()
@@ -163,9 +161,17 @@ object Boro {
   }
   
   def removePlayer(player: Boro) {
-    player.isAlive = false
-    val (prefix, suffix) = players splitAt players.indexOf(player)
-    players = prefix ++ suffix.tail
+    if (this.player == player) {
+      player.isAlive = false
+      Boro.player = new Boro(player.game)
+      Boro.player.game addUpdateable Boro.player
+      Boro.player.game.regularCam addDrawable Boro.player
+      player.game.loadLevel(player.game.currentLevel)
+    } else {
+      player.isAlive = false
+      val (prefix, suffix) = players splitAt players.indexOf(player)
+      players = prefix ++ suffix.tail
+    }
   }
   
   def clear() {
@@ -348,6 +354,10 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
             standing = false
           }
       }
+    }
+    
+    if (y < -100) {
+      kill()
     }
   }
   

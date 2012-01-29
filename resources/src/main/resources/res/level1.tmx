@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="30" height="20" tilewidth="64" tileheight="64">
+<map version="1.0" orientation="orthogonal" width="41" height="20" tilewidth="64" tileheight="64">
  <tileset firstgid="1" name="markers" tilewidth="64" tileheight="64" spacing="1" margin="1">
   <image source="markers.png" trans="ff00ff" width="456" height="456"/>
  </tileset>
  <tileset firstgid="50" name="terrain" tilewidth="64" tileheight="64" spacing="2" margin="1">
   <image source="terrenos.png" width="512" height="512"/>
  </tileset>
- <layer name="bottom" width="30" height="20">
+ <tileset firstgid="99" name="cave" tilewidth="64" tileheight="64" spacing="2" margin="1">
+  <image source="tiles.png" width="512" height="512"/>
+ </tileset>
+ <layer name="bottom" width="41" height="20">
   <data encoding="base64" compression="zlib">
-   eJxzZmBgcB7Fo3gUj+JRPIpHMc2x5SBwwyimDwYAcOec/w==
+   eJztziEBAAAIA7DXQtO/E4YASMTE/DpJAwAArHpwuBrbUNaT
   </data>
  </layer>
- <layer name="collision" width="30" height="20">
+ <layer name="collision" width="41" height="20">
   <data encoding="base64" compression="zlib">
-   eJxzZGBgcBwgTE8wau+ovaP2jto7kPaSYtaovSPHXlz1IrHm4VNHTn08UuylBwYALVErbA==
+   eJzVVtEOhCAM41+NZ0z05U7/X01cMndzdiMBbNInQCpdB11KqWucw85fgJ+HtWNw7G6fCOgb1nhkTCJHYym8ReNRkz3jVFXRP0gjZed7siWQ17W1zenqJSedX22sjNxb7jEK7X+1+kXnaVgEvbnW1i7APDqPSCZzeg9pQObJbHpQqj9KnZ6zLNnDZRZQ3y2Nsu5ze3s0r5ZGmS+k9rwaEd9reo3qbEWjVZ8tabzTqr17vPmw7lptL5T8vt4A2sdv0w==
   </data>
  </layer>
- <layer name="markers" width="30" height="20">
+ <layer name="markers" width="41" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMApGNmCkkz1MdLJnFAw8AAAPjAAE
+   eJztziEBAAAIAzCgf2gSIFA3W4JVAQAACZ0OHCYdeFgPbAAE
   </data>
  </layer>
 </map>

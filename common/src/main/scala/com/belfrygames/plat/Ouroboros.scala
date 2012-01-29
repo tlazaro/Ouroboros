@@ -94,7 +94,7 @@ class Ouroboros extends Screen {
   }
   
   var level: Level = _
-  var currentLevel = 0
+  var currentLevel = 1
   
   lazy val cursor = new Sprite with Particle with Updateable {
     textureRegion = Art.cursor
@@ -142,6 +142,10 @@ class Ouroboros extends Screen {
         if (Boro.player.canFire) {
           Boro.player.shoot(false)
         }
+      })
+    
+    restart.appendAction(() => {
+        loadLevel(currentLevel)
       })
     
     exit appendAction Gdx.app.exit
