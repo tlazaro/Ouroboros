@@ -356,7 +356,7 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
   def shoot(cloning: Boolean) {
     this.cloning = cloning
     Boro.player.canFire = false
-    frames = spitRightFrames
+    frames = if (game.cursor.x >= x) spitRightFrames else spitLeftFrames
     spitting = true
     Sound.shot.play
   }
