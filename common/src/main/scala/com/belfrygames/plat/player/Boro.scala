@@ -238,17 +238,15 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
       if (math.abs(v.x) >= Boro.MAX_SPEED) {
         body.setLinearVelocity(if (v.x < 0) -Boro.MAX_SPEED else Boro.MAX_SPEED, v.y)
       }
-    }
-    
-    if (this == Boro.player) {
-      if (action.isPressed) {
+      
+      if (standing && action.isPressed) {
         val pos = body.getPosition
         body.applyLinearImpulse(0, 13f, pos.x, pos.y)
       }
     }
     
     x = game.camToScreen(body.getPosition.x) + 16
-    y = game.camToScreen(body.getPosition.y) + 16
+    y = game.camToScreen(body.getPosition.y) + 28
     
     val speed = body.getLinearVelocity
     speed.x match {
@@ -268,14 +266,26 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
       textureRegion = if (lookingRight) Art.right else Art.left
     }
     
-    if (math.abs(speed.y) >= Boro.EPSILON) {
-      textureRegion = if (lookingRight) {
-        Art.jumpRight(2)
-      } else {
-        Art.jumpLeft(2)
-      }
+    import scala.collection.JavaConversions._
+    game.box2d.getContactList.find(contact => contact.getFixtureA.getBody == body || contact.getFixtureB.getBody == body) match {
+      case Some(contact) => {
+          val other = if (contact.getFixtureA.getBody != body) contact.getFixtureA.getBody else contact.getFixtureB.getBody
+          
+          if (other.getPosition.y > body.getPosition.y) {
+            textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
+            standing = false
+          } else {
+            standing = true
+          }
+        }
+      case _ => {
+          textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
+          standing = false
+        }
     }
   }
+  
+  var standing = true
   
   def shoot(cloning: Boolean) {
     this.cloning = cloning
