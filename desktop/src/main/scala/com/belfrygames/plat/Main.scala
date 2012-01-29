@@ -31,7 +31,6 @@ object Main {
     config.title = "Ouroboros"
     config.fullscreen = FULLSCREEN
     config.useCPUSynch = false
-    config.resizable = false
     
     new LwjglApplication(new com.belfrygames.plat.Ouroboros(), config)
   }

@@ -103,9 +103,12 @@ class Ouroboros extends Screen {
   override def create() {
     super.create()
     
+    Sound.soundtrack.play
+    Sound.soundtrack.setLooping(true)
+    
     addUpdateable(new Updateable {
         override def update (elapsed: Long @@ Milliseconds) {
-          box2d.step(0.05f, 3, 3)
+          box2d.step(0.1f, 3, 3)
         }
       })
     

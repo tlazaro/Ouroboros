@@ -11,12 +11,20 @@ object Art {
   lazy val font = new BitmapFont
   lazy val cursor = load("res/cursor.png")
   lazy val boro = split("res/boro.png", 100, 150, 1, 1, false, false)
+  lazy val birth = split("res/birth.png", 69, 145, 1, 1, false, false)(0).take(4)
   lazy val walkRight = boro(0).take(8)
   lazy val walkLeft = boro(1).take(8)
   lazy val jumpRight = boro(2).take(3)
   lazy val right = jumpRight(0)
   lazy val jumpLeft = boro(2).drop(3).take(3)
   lazy val left = jumpLeft(0)
+  
+  lazy val saliva = load("res/saliva.png")
+  lazy val deathRight = split("res/death.png", 103, 143, 1, 1, false, false).flatten.take(5)
+  lazy val deathLeft = {
+    val all = split("res/death.png", 103, 143, 1, 1, false, false).flatten.toList
+    all(5) :: all(6) :: all.drop(2)
+  }
   
   lazy val spitRight = split("res/spitRight.png", 102, 143, 1, 1, false, false)(0).take(6)
   lazy val spitLeft = split("res/spitLeft.png", 102, 143, 1, 1, false, false)(0).take(6)

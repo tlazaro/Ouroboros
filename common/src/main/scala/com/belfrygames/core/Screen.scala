@@ -16,6 +16,7 @@ import com.belfrygames.utils._
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.belfrygames.plat.Art
+import com.belfrygames.plat.Sound
 import com.belfrygames.plat.camera.FollowCamera
 import com.belfrygames.plat.player.Drawable
 import com.belfrygames.plat.player.Timed
@@ -92,6 +93,7 @@ class Screen extends ApplicationListener with DrawableParent with UpdateablePare
     inputs.addProcessor(DebugKeysController)
     
     Art.load()
+    Sound.load()
     
     timer.start
   }

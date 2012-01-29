@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Contact
 import com.belfrygames.plat.Art
 import com.belfrygames.plat.Ouroboros
+import com.belfrygames.plat.Sound
 import com.belfrygames.plat.utils.Loop
 import com.belfrygames.plat.utils.Point2D
 import com.belfrygames.tactics.InputMappings
@@ -52,19 +53,19 @@ class PhysicObject(val game: Ouroboros) {
   
   def createBody() {
     val p  = Point2D[Float](game.screenToCam(x) + 1, game.screenToCam(y) + 1)
-    createBody(p, 1)
+    createBody(p, 0)
   }
   
   def createBody(p: Point2D[Float], res: Float = 1) {
     val builder = new BodyBuilder(game.box2d)
-    body = builder.fixture(builder.fixtureDefBuilder.circleShape(1)).position(p.x, p.y).`type`(BodyType.DynamicBody).build
+    body = builder.fixture(builder.fixtureDefBuilder.circleShape(1).restitution(res)).position(p.x, p.y).`type`(BodyType.DynamicBody).build
     x = game.camToScreen(body.getPosition.x) + width / 2
     y = game.camToScreen(body.getPosition.y) + height / 2
   }
 }
 
 class Shot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with Sprite with AcceleratedUpdateable {
-  textureRegion = Art.cursor
+  textureRegion = Art.saliva
   
   var isAlive = true
   override def update(elapsed: Long @@ Milliseconds) {
@@ -78,7 +79,7 @@ class Shot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
       val bBody = contact.getFixtureB.getBody
           
       Boro.players find (p => aBody == p.body || bBody == p.body) match {
-        case Some(p) => Boro.removePlayer(p)
+        case Some(p) => p.kill
         case _ =>
       }
       Shot.removeShot(this)
@@ -108,7 +109,7 @@ object CloneShot {
 }
  
 class CloneShot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with Sprite with AcceleratedUpdateable {
-  textureRegion = Art.cursor
+  textureRegion = Art.saliva
   
   var isAlive = true
   override def update(elapsed: Long @@ Milliseconds) {
@@ -120,6 +121,7 @@ class CloneShot(private[this] val game0: Ouroboros) extends PhysicObject(game0) 
           
       Boro.players find (p => aBody == p.body || bBody == p.body) match {
         case None => {
+            Sound.birth.play
             val spawn = new Boro(game)
             spawn.x = x
             spawn.y = y
@@ -163,7 +165,6 @@ object Boro {
   
   def removePlayer(player: Boro) {
     player.isAlive = false
-    player.game.box2d.destroyBody(player.body)
     val (prefix, suffix) = players splitAt players.indexOf(player)
     players = prefix ++ suffix.tail
   }
@@ -175,7 +176,7 @@ object Boro {
 }
 
 class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with Sprite with AcceleratedUpdateable {
-  textureRegion = Art.right
+  textureRegion = Art.birth.head
   
   val rightFrames = Art.walkRight.toList
   val leftFrames = Art.walkLeft.toList
@@ -185,6 +186,13 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
   val spitLeftFrames = Art.spitLeft.toList
   val shootFunc = new CountFunc(tag(500), spitRightFrames.length)
   
+  val birthFrames = Art.birth.toList
+  val birthFunc = new CountFunc(tag(500), birthFrames.length)
+  
+  val deathRightFrames = Art.deathRight.toList
+  val deathLeftFrames = Art.deathLeft.toList
+  val deathFunc = new CountFunc(tag(500), deathRightFrames.length)
+  
   var frames = rightFrames
   var lookingRight = true
   
@@ -193,12 +201,55 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
   var lastFrame = -1
   var cloning = false
   
+  var birthing = true
+  var dying = false
+  
+  def kill() {
+    dying = true
+    game.box2d.destroyBody(body)
+  }
+  
   override def update(elapsed: Long @@ Milliseconds) {
     if (!keepUpdatable) {
       return
     }
     
     super.update(elapsed)
+    
+    if (dying) {
+      deathFunc update elapsed
+      val nextFrame = deathFunc()
+      if (lastFrame > nextFrame) {
+        lastFrame = -1
+        Boro.removePlayer(this)
+      } else {
+        lastFrame = nextFrame
+        frames = if(lookingRight) deathRightFrames else deathLeftFrames
+        textureRegion = frames(lastFrame)
+      }
+      
+      x = game.camToScreen(body.getPosition.x) + 16
+      y = game.camToScreen(body.getPosition.y) + 28
+      
+      return
+    }
+    
+    if (birthing) {
+      birthFunc update elapsed
+      val nextFrame = birthFunc()
+      if (lastFrame > nextFrame) {
+        birthing = false
+        lastFrame = -1
+      } else {
+        lastFrame = nextFrame
+        textureRegion = birthFrames(lastFrame)
+      }
+      
+      x = game.camToScreen(body.getPosition.x) + 16
+      y = game.camToScreen(body.getPosition.y) + 28
+    
+      return
+    }
     
     if (spitting) {
       shootFunc update elapsed
@@ -252,6 +303,7 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
       }
       
       if (standing && action.isPressed) {
+        Sound.jump.play
         val pos = body.getPosition
         body.applyLinearImpulse(0, 13f, pos.x, pos.y)
       }
@@ -307,6 +359,7 @@ class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with 
     Boro.player.canFire = false
     frames = spitRightFrames
     spitting = true
+    Sound.shot.play
   }
   
   var isAlive = true
