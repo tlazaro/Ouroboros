@@ -104,6 +104,7 @@ class CloneShot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
       val spawn = new Boro(game)
       spawn.x = x
       spawn.y = y
+      spawn.createBody
       
       CloneShot.removeShot(this)
       
@@ -137,6 +138,7 @@ object Boro {
   
   def removePlayer(player: Boro) {
     player.isAlive = false
+    player.game.box2d.destroyBody(player.body)
     val (prefix, suffix) = players splitAt players.indexOf(player)
     players = prefix ++ suffix.tail
   }
@@ -149,8 +151,6 @@ object Boro {
 
 class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
   textureRegion = Art.right
-  
-  yAccel = Boro.GRAVITY
   
   val rightFrames = Art.walkRight.toList
   val leftFrames = Art.walkLeft.toList
@@ -172,8 +172,7 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
   
   def createBody() {
     val builder = new BodyBuilder(game.box2d)
-    val p  = Point2D[Float](game.screenToCam(x)*2 + 1, game.screenToCam(y)*2 +1)
-    println(p)
+    val p  = Point2D[Float](game.screenToCam(x) + 1, game.screenToCam(y) + 1)
     body = builder.fixture(builder.fixtureDefBuilder.circleShape(1)).position(p.x, p.y).`type`(BodyType.DynamicBody).build
   }
   
@@ -219,7 +218,6 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
         xSpeed = 0
         ySpeed = 0
         yAccel = 0
-        return
       }
     }
     
@@ -227,7 +225,7 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
     
     import InputMappings._
     
-    if (this == Boro.player) {
+    if (!spitting && this == Boro.player) {
       if (left.isPressed) {
         body.applyForceToCenter(-5, 0)
       } else if (right.isPressed) {
@@ -248,40 +246,42 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
     x = game.camToScreen(body.getPosition.x) + 16
     y = game.camToScreen(body.getPosition.y) + 28
     
-    val speed = body.getLinearVelocity
-    speed.x match {
-      case ab if ab > Boro.EPSILON =>  {
-          frames = rightFrames
-          lookingRight = true
-        }
-      case ab if ab < -Boro.EPSILON => {
-          frames = leftFrames
-          lookingRight = false
-        }
-      case _ =>
-    }
-    textureRegion = frames(animfunc())
+    if (!spitting) {
+      val speed = body.getLinearVelocity
+      speed.x match {
+        case ab if ab > Boro.EPSILON =>  {
+            frames = rightFrames
+            lookingRight = true
+          }
+        case ab if ab < -Boro.EPSILON => {
+            frames = leftFrames
+            lookingRight = false
+          }
+        case _ =>
+      }
+      textureRegion = frames(animfunc())
     
-    if (math.abs(speed.x) <= Boro.EPSILON) {
-      textureRegion = if (lookingRight) Art.right else Art.left
-    }
+      if (math.abs(speed.x) <= Boro.EPSILON) {
+        textureRegion = if (lookingRight) Art.right else Art.left
+      }
     
-    import scala.collection.JavaConversions._
-    game.box2d.getContactList.find(contact => contact.getFixtureA.getBody == body || contact.getFixtureB.getBody == body) match {
-      case Some(contact) => {
-          val other = if (contact.getFixtureA.getBody != body) contact.getFixtureA.getBody else contact.getFixtureB.getBody
+      import scala.collection.JavaConversions._
+      game.box2d.getContactList.find(contact => contact.getFixtureA.getBody == body || contact.getFixtureB.getBody == body) match {
+        case Some(contact) => {
+            val other = if (contact.getFixtureA.getBody != body) contact.getFixtureA.getBody else contact.getFixtureB.getBody
           
-          if (other.getPosition.y > body.getPosition.y) {
+            if (other.getPosition.y > body.getPosition.y) {
+              textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
+              standing = false
+            } else {
+              standing = true
+            }
+          }
+        case _ => {
             textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
             standing = false
-          } else {
-            standing = true
           }
-        }
-      case _ => {
-          textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
-          standing = false
-        }
+      }
     }
   }
   
@@ -297,46 +297,4 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
   var isAlive = true
   override def keepUpdatable = isAlive
   override def keepDrawable = isAlive
-  
-  /**
-   if (xSpeed == 0) {
-   textureRegion = if (lookingRight) Art.right else Art.left
-   } else {
-   val p = if (xSpeed > 0) east else west
-   val pX = game.level.globalToLocal((p.x + xSpeed).toInt, p.y.toInt)
-   if (game.level.collides(pX)) {
-      xSpeed = 0
-    }
-   }
-    
-   val (airLeft, airRight) = if (ySpeed > 0) { (topLeft, topRight) } else { (bottomLeft, bottomRight) }
-   val p1 = game.level.globalToLocal((airLeft.x + xSpeed).toInt, (airLeft.y + ySpeed).toInt)
-   val p2 = game.level.globalToLocal((airRight.x + xSpeed).toInt, (airRight.y + ySpeed).toInt)
-   if (game.level.collides(p1) || game.level.collides(p2)) {
-      val dir = if (ySpeed > 0) 1 else -1
-      
-      ySpeed = 0
-      yAccel = 0
-      
-      var newY = p1.y
-      do {
-        newY += dir
-      } while(newY >= 0 && newY < game.level.map.height &&
-              (game.level.collides(Point2D[Int](p1.x, newY)) ||
-               game.level.collides(Point2D[Int](p2.x, newY))))
-      
-      val dest = game.level.localToGlobal(p1.x, newY)
-      y = dest.y
-    } else {
-      yAccel = Boro.GRAVITY
-    }
-    
-   if (ySpeed != 0) {
-      textureRegion = if (lookingRight) {
-        Art.jumpRight(2)
-      } else {
-        Art.jumpLeft(2)
-      }
-    } 
-   */
-   }
+}

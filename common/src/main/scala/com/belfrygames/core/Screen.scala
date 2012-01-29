@@ -112,15 +112,6 @@ class Screen extends ApplicationListener with DrawableParent with UpdateablePare
   }
   
   def screenToCamera(x: Int, y: Int) = {
-    //TODO
-//    resizePolicy match {
-//      case Screen.FitScreen => if (width >= height) (height * Config.WIDTH / Config.HEIGHT, height) else (width, width * Config.WIDTH / Config.HEIGHT)
-//      case Screen.Stretch => Point2D((p.x * Config.WIDTH / Gdx.graphics.getWidth) , (p.y * Config.HEIGHT / Gdx.graphics.getHeight))
-//      case Screen.Original => {
-//          val x = if(p.x <= Config.WIDTH)
-//          (Config.WIDTH, Config.HEIGHT)
-//      }
-//    }
     Point2D((x * Config.WIDTH / Gdx.graphics.getWidth) * cam.zoom, (y * Config.HEIGHT / Gdx.graphics.getHeight) * cam.zoom)
   }
   
@@ -161,13 +152,11 @@ class Screen extends ApplicationListener with DrawableParent with UpdateablePare
   
   private[this] val keys = """Keys:
 - Tab : Toggle Debug info
-- F1 : Toggle Keys help
-- F2 : Screen: FitScreen
-- F3 : Screen: Original
-- F4 : Screen: Stretch
+- F1 : Toggle this help
 - Arrows or WASD: Move
-- X or Space: Action
-- +/- Zoom in/out
+- X or Space: Jump
+- Left click: Normal shot
+- Clone click: Clone shot
 - Esc : Exit""".split("\n").view.zipWithIndex.toList
   
   def resume( ) { }
@@ -183,9 +172,9 @@ object DebugKeysController extends InputAdapter {
     keycode match {
       case TAB => Screen.DEBUG = !Screen.DEBUG
       case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
-      case F2 => Screen.resizePolicy = Screen.FitScreen
-      case F3 => Screen.resizePolicy = Screen.Original
-      case F4 => Screen.resizePolicy = Screen.Stretch
+//      case F2 => Screen.resizePolicy = Screen.FitScreen
+//      case F3 => Screen.resizePolicy = Screen.Original
+//      case F4 => Screen.resizePolicy = Screen.Stretch
       case _ =>
     }
 

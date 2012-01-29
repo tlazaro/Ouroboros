@@ -98,25 +98,25 @@ class Ouroboros extends Screen {
         override def draw (spriteBatch: SpriteBatch) {
           level.tileMapRenderer.render(cam)
           
-          val oldX = cam.position.x
-          val oldY = cam.position.y
-          
-          // 31 + 9 * 2
-          val offset_x = screenToCam(oldX)
-          val offset_y = screenToCam(oldY)
-          
-          cam.zoom = 2.0f / 32.0f
-          
-          cam.position.x = offset_x
-          cam.position.y = offset_y
-          cam.update
-          
-          box2drenderer.render(box2d, cam.combined)
-          
-          cam.zoom = 2.f
-          cam.position.x = oldX
-          cam.position.y = oldY
-          cam.update
+          if (Screen.DEBUG) {
+            val oldX = cam.position.x
+            val oldY = cam.position.y
+
+            val offset_x = screenToCam(oldX)
+            val offset_y = screenToCam(oldY)
+
+            cam.zoom = 2.0f / 32.0f
+            cam.position.x = offset_x
+            cam.position.y = offset_y
+            cam.update
+
+            box2drenderer.render(box2d, cam.combined)
+
+            cam.zoom = 2.f
+            cam.position.x = oldX
+            cam.position.y = oldY
+            cam.update
+          }
         }
       })
     
@@ -124,7 +124,7 @@ class Ouroboros extends Screen {
         override def update (elapsed: Long @@ Milliseconds) {
           box2d.step(0.1f, 3, 3)
         }
-    })
+      })
     
     updateFollowCamRestrictions()
     
