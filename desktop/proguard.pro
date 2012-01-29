@@ -46,7 +46,6 @@
     <fields>;
     <methods>;
 }
-com.badlogic.gdx.physics.box2d
 
 -keep class org.badlogic.openal.** {
     <fields>;
