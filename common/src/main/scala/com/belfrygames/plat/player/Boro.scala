@@ -1,6 +1,7 @@
 package com.belfrygames.plat.player
 
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.Contact
 import com.belfrygames.plat.Art
 import com.belfrygames.plat.Ouroboros
 import com.belfrygames.plat.utils.Loop
@@ -33,6 +34,7 @@ object Shot {
   var shots = List[Shot]()
   def removeShot(s: Shot) {
     s.isAlive = false
+    s.game.box2d.destroyBody(s.body)
     val (prefix, suffix) = shots splitAt shots.indexOf(s)
     shots = prefix ++ suffix.tail
   }
@@ -43,27 +45,43 @@ object Shot {
   }
 }
 
-class Shot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
+class PhysicObject(val game: Ouroboros) {
+  self: Sprite with AcceleratedUpdateable =>
+  var body: Body = _
+  var contact: Contact = _
+  
+  def createBody() {
+    val p  = Point2D[Float](game.screenToCam(x) + 1, game.screenToCam(y) + 1)
+    createBody(p, 1)
+  }
+  
+  def createBody(p: Point2D[Float], res: Float = 1) {
+    val builder = new BodyBuilder(game.box2d)
+    body = builder.fixture(builder.fixtureDefBuilder.circleShape(1)).position(p.x, p.y).`type`(BodyType.DynamicBody).build
+    x = game.camToScreen(body.getPosition.x) + width / 2
+    y = game.camToScreen(body.getPosition.y) + height / 2
+  }
+}
+
+class Shot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with Sprite with AcceleratedUpdateable {
   textureRegion = Art.cursor
-  yAccel = Shot.GRAVITY
   
   var isAlive = true
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
     
-    val xEdge = xSpeed + x + (if (xSpeed > 0) width else 0)
-    val yEdge = ySpeed + y + (if (ySpeed > 0) height else 0)
+    x = game.camToScreen(body.getPosition.x) + width / 2
+    y = game.camToScreen(body.getPosition.y) + height / 2
     
-    val p = game.level.globalToLocal(Point2D[Int](xEdge.toInt, yEdge.toInt))
-    
-    Boro.players find (p => (x >= p.x && x <= p.x + p.width && y >= p.y && y <= p.y + p.height)) match {
-      case Some(p) => {
-          Shot.removeShot(this)
-          Boro.removePlayer(p)
-        }
-      case _ => if (game.level.collides(p)) {
-          Shot.removeShot(this)
-        }
+    if (contact != null) {
+      val aBody = contact.getFixtureA.getBody
+      val bBody = contact.getFixtureB.getBody
+          
+      Boro.players find (p => aBody == p.body || bBody == p.body) match {
+        case Some(p) => Boro.removePlayer(p)
+        case _ =>
+      }
+      Shot.removeShot(this)
     }
   }
   
@@ -78,6 +96,7 @@ object CloneShot {
   var shots = List[CloneShot]()
   def removeShot(s: CloneShot) {
     s.isAlive = false
+    s.game.box2d.destroyBody(s.body)
     val (prefix, suffix) = shots splitAt shots.indexOf(s)
     shots = prefix ++ suffix.tail
   }
@@ -88,32 +107,38 @@ object CloneShot {
   }
 }
  
-class CloneShot(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
+class CloneShot(private[this] val game0: Ouroboros) extends PhysicObject(game0) with Sprite with AcceleratedUpdateable {
   textureRegion = Art.cursor
-  yAccel = Shot.GRAVITY
   
   var isAlive = true
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
     
-    val xEdge = xSpeed + x + (if (xSpeed > 0) width else 0)
-    val yEdge = ySpeed + y + (if (ySpeed > 0) height else 0)
-    
-    val p = game.level.globalToLocal(Point2D[Int](xEdge.toInt, yEdge.toInt))
-    if (game.level.collides(p)) {
-      val spawn = new Boro(game)
-      spawn.x = x
-      spawn.y = y
-      spawn.createBody
+    if (contact != null) {
+      val aBody = contact.getFixtureA.getBody
+      val bBody = contact.getFixtureB.getBody
+          
+      Boro.players find (p => aBody == p.body || bBody == p.body) match {
+        case None => {
+            val spawn = new Boro(game)
+            spawn.x = x
+            spawn.y = y
+            spawn.createBody
       
-      CloneShot.removeShot(this)
+            CloneShot.removeShot(this)
       
-      game addUpdateable spawn
-      game.regularCam addDrawable spawn
+            game addUpdateable spawn
+            game.regularCam addDrawable spawn
       
-      Boro.player.xSpeed = 0
-      Boro.newPlayer(spawn)
-      game.followCam.target = Boro.player
+            Boro.player.xSpeed = 0
+            Boro.newPlayer(spawn)
+            game.followCam.target = Boro.player
+          }
+        case _ =>
+      }
+    } else {
+      x = game.camToScreen(body.getPosition.x) + width / 2
+      y = game.camToScreen(body.getPosition.y) + height / 2
     }
   }
   
@@ -149,7 +174,7 @@ object Boro {
   }
 }
 
-class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
+class Boro(private[this] val game0: Ouroboros) extends PhysicObject(game0) with Sprite with AcceleratedUpdateable {
   textureRegion = Art.right
   
   val rightFrames = Art.walkRight.toList
@@ -168,15 +193,11 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
   var lastFrame = -1
   var cloning = false
   
-  var body: Body = _
-  
-  def createBody() {
-    val builder = new BodyBuilder(game.box2d)
-    val p  = Point2D[Float](game.screenToCam(x) + 1, game.screenToCam(y) + 1)
-    body = builder.fixture(builder.fixtureDefBuilder.circleShape(1)).position(p.x, p.y).`type`(BodyType.DynamicBody).build
-  }
-  
   override def update(elapsed: Long @@ Milliseconds) {
+    if (!keepUpdatable) {
+      return
+    }
+    
     super.update(elapsed)
     
     if (spitting) {
@@ -187,7 +208,7 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
         lastFrame = -1
         frames = rightFrames
         
-        var sprite = if (cloning) {
+        var sprite: PhysicObject with Sprite with AcceleratedUpdateable = if (cloning) {
           val ball = new CloneShot(game)
           CloneShot.shots ::= ball
           game.followCam.target = ball
@@ -197,15 +218,12 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
           Shot.shots ::= ball
           ball
         }
+        val pos = body.getPosition
+        sprite.createBody(Point2D[Float](pos.x, pos.y + 1.2f))
         
-        val origin = north
-        sprite.x = origin.x - sprite.width / 2
-        sprite.y = origin.y - sprite.height / 2 - 40
-
         val dir = new Vector2(game.cursor.x - sprite.x, game.cursor.y - sprite.y)
-        val speed = dir.nor.mul(Shot.SPEED)
-        sprite.xSpeed = speed.x
-        sprite.ySpeed = speed.y
+        val speed = dir.nor.mul(20)
+        sprite.body.setLinearVelocity(speed.x, speed.y)
 
         game.addUpdateable(sprite)
         game.regularCam.addDrawable(sprite)
@@ -214,10 +232,6 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
       } else {
         lastFrame = nextFrame
         textureRegion = frames(lastFrame)
-        
-        xSpeed = 0
-        ySpeed = 0
-        yAccel = 0
       }
     }
     
@@ -265,16 +279,17 @@ class Boro(val game: Ouroboros) extends Sprite with AcceleratedUpdateable {
         textureRegion = if (lookingRight) Art.right else Art.left
       }
     
+      standing = true
       import scala.collection.JavaConversions._
       game.box2d.getContactList.find(contact => contact.getFixtureA.getBody == body || contact.getFixtureB.getBody == body) match {
         case Some(contact) => {
             val other = if (contact.getFixtureA.getBody != body) contact.getFixtureA.getBody else contact.getFixtureB.getBody
           
-            if (other.getPosition.y > body.getPosition.y) {
-              textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
-              standing = false
-            } else {
-              standing = true
+            if (math.abs(contact.getWorldManifold.getNormal.nor.x) <= Boro.EPSILON) {
+              if (other.getPosition.y > body.getPosition.y) {
+                textureRegion = if (lookingRight) Art.jumpRight(2) else Art.jumpLeft(2)
+                standing = false
+              }
             }
           }
         case _ => {

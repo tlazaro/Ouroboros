@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.belfrygames.core.Config
 import com.belfrygames.core.Screen
 import com.belfrygames.input.InputManager
@@ -19,7 +18,10 @@ import com.belfrygames.plat.player.Updateable
 import com.belfrygames.tactics.InputMappings
 import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
-import com.gemserk.commons.gdx.box2d.BodyBuilder
+import com.badlogic.gdx.physics.box2d.Contact
+import com.badlogic.gdx.physics.box2d.ContactImpulse
+import com.badlogic.gdx.physics.box2d.ContactListener
+import com.badlogic.gdx.physics.box2d.Manifold
 
 class Ouroboros extends Screen {
   def levelName(n: Int) = "res/level" + n + ".tmx"
@@ -27,11 +29,47 @@ class Ouroboros extends Screen {
   
   lazy val box2dCam = new OrthographicCamera(Config.WIDTH, Config.HEIGHT)
   
+  val contactListener = new ContactListener() {
+    def beginContact(contact: Contact) {
+      if (!contact.isTouching) return
+          
+      val aBody = contact.getFixtureA.getBody
+      val bBody = contact.getFixtureB.getBody
+          
+      if (aBody != Boro.player.body && bBody != Boro.player.body) {
+        Shot.shots.find(s => (aBody == s.body) || (bBody == s.body)) match {
+          case Some(s) => {
+              if (s.contact == null)
+                s.contact = contact
+            }
+          case _ => CloneShot.shots.find(s => aBody == s.body || bBody == s.body) match {
+              case Some(s) => {
+                  if (s.contact == null)
+                    s.contact = contact
+                }
+              case _ =>
+            }
+        }
+      }
+    }
+    def endContact(contact: Contact) {
+          
+    }
+    def postSolve(contact: Contact, impulse: ContactImpulse) {
+          
+    }
+    def preSolve(contact: Contact, oldManifold: Manifold) {
+          
+    }
+  }
+  
   def loadLevel(n: Int) = {
     if (box2d != null) {
       box2d.dispose
     }
     box2d = new World(gravity, false)
+    
+    box2d.setContactListener(contactListener)
     
     level =  new Level(Gdx.files.internal(levelName(n)), cam)
     Boro.player.x = level.start.x
@@ -65,6 +103,11 @@ class Ouroboros extends Screen {
   override def create() {
     super.create()
     
+    addUpdateable(new Updateable {
+        override def update (elapsed: Long @@ Milliseconds) {
+          box2d.step(0.05f, 3, 3)
+        }
+      })
     
     Boro.player = new Boro(this)
     loadLevel(currentLevel)
@@ -117,12 +160,6 @@ class Ouroboros extends Screen {
             cam.position.y = oldY
             cam.update
           }
-        }
-      })
-    
-    addUpdateable(new Updateable {
-        override def update (elapsed: Long @@ Milliseconds) {
-          box2d.step(0.1f, 3, 3)
         }
       })
     
