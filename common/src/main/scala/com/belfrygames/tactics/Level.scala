@@ -7,10 +7,13 @@ import com.badlogic.gdx.graphics.g2d.tiled.SimpleTileAtlas
 import com.badlogic.gdx.graphics.g2d.tiled.TileMapRenderer
 import com.badlogic.gdx.graphics.g2d.tiled.TiledLoader
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.box2d.World
 import com.belfrygames.plat.player.Drawable
 import com.belfrygames.plat.player.Updateable
 import com.belfrygames.plat.utils.Point2D
 import com.belfrygames.utils._
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
+import com.gemserk.commons.gdx.box2d.BodyBuilder
 import scala.collection.JavaConversions._
 
 object Level {
@@ -75,6 +78,15 @@ class Level (private[this] val file0: FileHandle, val camera : OrthographicCamer
       case c => collision(c.x)(c.y) match {
         case 1 => true
         case _ => false
+      }
+    }
+  }
+  
+  def createBox2D(box2d: World) {
+    for(x <- 0 until collision.length; y <- 0 until collision(0).length) {
+      if (collision(x)(y) == 1) {
+        val builder = new BodyBuilder(box2d)
+        val body = builder.fixture(builder.fixtureDefBuilder.boxShape(1, 1)).position(x * 2, 2 * (map.height - 1 - y)).`type`(BodyType.StaticBody).build
       }
     }
   }

@@ -15,6 +15,8 @@ object InputMappings {
   val cloneShot = new GameAction("clone", GameAction.DETECT_INITAL_PRESS_ONLY)
   val shot = new GameAction("shot", GameAction.DETECT_INITAL_PRESS_ONLY)
   
+  val jump = new GameAction("jump", GameAction.NORMAL)
+  
   val exit = new GameAction("exit", GameAction.DETECT_INITAL_PRESS_ONLY)
   val pause = new GameAction("pause", GameAction.DETECT_INITAL_PRESS_ONLY)
   val zoomin = new GameAction("zoomin", GameAction.DETECT_INITAL_PRESS_ONLY)
@@ -27,6 +29,8 @@ object InputMappings {
   InputManager.mapToKey(pause, Input.Keys.P)
   InputManager.mapToKey(zoomin, Input.Keys.PLUS)
   InputManager.mapToKey(zoomout, Input.Keys.MINUS)
+  
+  InputManager.mapToKey(jump, Input.Keys.V)
 
   // Special Actions
   InputManager.mapToKey(menu, Input.Keys.M)

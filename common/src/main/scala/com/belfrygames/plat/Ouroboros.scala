@@ -1,8 +1,13 @@
 package com.belfrygames.plat
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
+import com.belfrygames.core.Config
 import com.belfrygames.core.Screen
 import com.belfrygames.input.InputManager
 import com.belfrygames.plat.player.Boro
@@ -14,12 +19,20 @@ import com.belfrygames.plat.player.Updateable
 import com.belfrygames.tactics.InputMappings
 import com.belfrygames.tactics.Level
 import com.belfrygames.utils._
+import com.gemserk.commons.gdx.box2d.BodyBuilder
 
 class Ouroboros extends Screen {
   def levelName(n: Int) = "res/level" + n + ".tmx"
   def existsLevel(n: Int) = Gdx.files.internal(levelName(n)).exists
   
+  lazy val box2dCam = new OrthographicCamera(Config.WIDTH, Config.HEIGHT)
+  
   def loadLevel(n: Int) = {
+    if (box2d != null) {
+      box2d.dispose
+    }
+    box2d = new World(gravity, false)
+    
     level =  new Level(Gdx.files.internal(levelName(n)), cam)
     Boro.player.x = level.start.x
     Boro.player.y = level.start.y
@@ -29,6 +42,8 @@ class Ouroboros extends Screen {
     CloneShot.clear
     
     followCam.target = Boro.player
+    level.createBox2D(box2d)
+    Boro.player.createBody
   }
   
   var level: Level = _
@@ -43,14 +58,20 @@ class Ouroboros extends Screen {
     }
   }
   
+  val gravity = new Vector2(0, -10)
+  var box2d: World = _
+  lazy val box2drenderer = new Box2DDebugRenderer
+  
   override def create() {
     super.create()
+    
     
     Boro.player = new Boro(this)
     loadLevel(currentLevel)
     
     inputs.addProcessor(InputManager)
     
+    box2dCam.zoom = 64
     cam.zoom = 2.0f
     
     import InputMappings._
@@ -76,8 +97,34 @@ class Ouroboros extends Screen {
     specialCam.addDrawable(new com.belfrygames.plat.player.Drawable {
         override def draw (spriteBatch: SpriteBatch) {
           level.tileMapRenderer.render(cam)
+          
+          val oldX = cam.position.x
+          val oldY = cam.position.y
+          
+          // 31 + 9 * 2
+          val offset_x = screenToCam(oldX)
+          val offset_y = screenToCam(oldY)
+          
+          cam.zoom = 2.0f / 32.0f
+          
+          cam.position.x = offset_x
+          cam.position.y = offset_y
+          cam.update
+          
+          box2drenderer.render(box2d, cam.combined)
+          
+          cam.zoom = 2.f
+          cam.position.x = oldX
+          cam.position.y = oldY
+          cam.update
         }
       })
+    
+    addUpdateable(new Updateable {
+        override def update (elapsed: Long @@ Milliseconds) {
+          box2d.step(0.1f, 3, 3)
+        }
+    })
     
     updateFollowCamRestrictions()
     
@@ -90,6 +137,8 @@ class Ouroboros extends Screen {
     maxCamPosition.set(level.tileMapRenderer.getMapWidthUnits(), level.tileMapRenderer.getMapHeightUnits())
   }
   
+  def screenToCam(x: Float) = (x * cam.zoom / 64) - 1
+  def camToScreen(x: Float) = (x - 1) * 64 / cam.zoom
   
   val dirToGoal = new Vector2(0.0f, 0.0f)
   val GOAL_DISTANCE = 64

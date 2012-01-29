@@ -21,7 +21,7 @@ class FollowCamera(val camera : Camera) extends AcceleratedUpdateable {
   var maxX = Float.MaxValue
   var maxY = Float.MaxValue
 
-  val speed = Boro.SPEED * 0.9f
+  val speed = Boro.MAX_SPEED * 0.9f
   var lerp = 0.9f
 
   val oldDir = new Vector2(0.0f, 0.0f)
