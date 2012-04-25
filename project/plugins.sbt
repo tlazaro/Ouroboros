@@ -4,7 +4,7 @@ libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-proguard-pl
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.7.2")
 
-addSbtPlugin("org.scala-tools.sbt" % "sbt-android-plugin" % "0.6.1-SNAPSHOT")
+addSbtPlugin("org.scala-tools.sbt" % "sbt-android-plugin" % "0.6.2-SNAPSHOT")
 
 resolvers += "cloudbees snapshots" at "https://repository-belfry.forge.cloudbees.com/snapshot"
 
